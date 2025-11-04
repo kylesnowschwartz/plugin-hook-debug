@@ -21,11 +21,11 @@ Both hooks:
 The only difference is the reason text to identify which hook executed.
 
 ## Steps:
-###'Inline' hook (working)
+### 'Inline' hook (working)
 1. Ensure 'inline' stop hook is configured in your local settings.json file and plugin is disabled
 2. Type anything - see the inline hook response:
 
-##'Plugin' hook (not working)
+### 'Plugin' hook (not working)
 1. Remove the 'inline' hook config from your settings.json, add the test-plugin marketplace and enable the plugin
 2. Type anything - see the different response:
 
