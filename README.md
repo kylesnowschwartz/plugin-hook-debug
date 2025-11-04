@@ -15,79 +15,19 @@ This repo contains two nearly-identical bash Stop hooks:
 
 Both hooks:
 - Read input from STDIN
-- Output valid JSON with `decision: "block"` and a reason message
-- Exit with code 0
+- Output valid JSON with `decision: "block"` and a reason message and suppress output true
+- Exit with code 2
 
 The only difference is the reason text to identify which hook executed.
 
-## Reproduction Steps
+## Steps:
+###'Inline' hook (working)
+1. Ensure 'inline' stop hook is configured in your local settings.json file and plugin is disabled
+2. Type anything - see the inline hook response:
 
-### Test 1: Plugin hook only
-
-1. Edit `.claude/settings.json` and comment out the inline hook configuration:
-   ```json
-   {
-     "hooks": {
-       "Stop": []
-     },
-     "enabledPlugins": {
-       "test-plugin": true
-     }
-   }
-   ```
-
-2. Run Claude Code in this directory
-3. Trigger a Stop hook (let Claude finish a response)
-4. Check debug logs at `~/.claude/debug/[session-id].txt`
-
-**Expected:** Should see `Hooks: Checking initial response for async: {...}` and `Successfully parsed hook JSON output`
-
-**Actual:** Skips directly from `Matched 1 unique hooks` to `Hooks: getAsyncHookResponseAttachments called` with no parsing
-
-### Test 2: Inline hook only
-
-1. Edit `.claude/settings.json` to enable inline hook and disable plugin:
-   ```json
-   {
-     "hooks": {
-       "Stop": [
-         {
-           "hooks": [
-             {
-               "type": "command",
-               "command": "hooks/entrypoints/stop.sh"
-             }
-           ]
-         }
-       ]
-     },
-     "enabledPlugins": {
-       "test-plugin": false
-     }
-   }
-   ```
-
-2. Run Claude Code in this directory
-3. Trigger a Stop hook
-4. Check debug logs
-
-**Expected:** Should see parsing messages and "Inline hook executed successfully" in output
-
-**Actual:** Works correctly - logs show `Hooks: Checking initial response` and `Successfully parsed hook JSON output`
-
-## Manual Testing
-
-Both hooks output valid JSON when tested manually:
-
-```bash
-# Test plugin hook
-echo '{}' | ./plugins/test-plugin/hooks/entrypoints/stop.sh
-# Output: {"continue":true,"stopReason":"","suppressOutput":false,"decision":"block","reason":"Plugin hook executed successfully"}
-
-# Test inline hook
-echo '{}' | ./hooks/entrypoints/stop.sh
-# Output: {"continue":true,"stopReason":"","suppressOutput":false,"decision":"block","reason":"Inline hook executed successfully"}
-```
+##'Plugin' hook (not working)
+1. Remove the 'inline' hook config from your settings.json, add the test-plugin marketplace and enable the plugin
+2. Type anything - see the different response:
 
 ## Debug Log Comparison
 
